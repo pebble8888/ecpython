@@ -1,5 +1,7 @@
 #!/usr/bin/env python 
 
+gp = 11 
+
 #%matplotlib inline 
 #import matplotlib
 #matplotlib.use('TkAgg')
@@ -109,11 +111,11 @@ class EC:
             q = ec.plus(q, p)
         return q
 
-ec = EC(0, 0, 7, 13)
+ec = EC(0, 0, 7, gp)
 
 print ("F" + str(ec.p))
 m3 = ec.p % 3
-print ("p mod 3:" + str(m3))
+print ("p mod 3 is " + str(m3))
 #print ("d:" + str(ec.d()))
 print ("j:" + str(ec.d()))
 print ("#EC:" + str(ec.order))
