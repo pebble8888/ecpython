@@ -117,7 +117,9 @@ s = (inv(nonce,l) * (msg_i + r * sk)) % l
 #   not implement
 
 print("r = %d" % r)
+print("r = 0x%x" % r)
 print("s = %d" % s)
+print("s = 0x%x" % s)
 
 # -- verify
 si = inv(s,l)
