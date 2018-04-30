@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # secp256k1
 # http://www.secg.org/SEC2-Ver-1.0.pdf
@@ -54,6 +54,7 @@ def add_pt(P, Q):
 
 def scalarmult(P, e):
     if e == 0: return [-1, -1]
+    if e < 0: e = e + l
     Q = scalarmult(P, e//2)
     Q = add_pt(Q, Q)
     if e & 1: Q = add_pt(Q, P)
@@ -68,65 +69,48 @@ Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
 Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
 G = [Gx, Gy]
 
-# big endian
-def bit(h, i):
-    return (h[i//8] >> (7-(i%8))) & 1
-
 # 32 byte array to big endian integer
 def decodeint(s):
     assert(len(s) == 32)
-    return sum(2**(b-1-i) * bit(s,i) for i in range(0,b))
+    return int.from_bytes(s, 'big')
 
-print("q  = %x" % q)
-print("Gx = %x" % Gx)
-print("Gy = %x" % Gy)
-print("l  = %x,%d" % (l, l))
-if isoncurve(G):
-    print("G is on curve")
-else:
-    assert False, "G is not on curve!"
+# big endian integer to 32 byte array
+def encodeint(y):
+  return y.to_bytes(32, byteorder='big')
 
-T = scalarmult(G, l)
-print("T  = (%x, %x)" % (T[0], T[1]) )
-
-sk = 3
-PK = scalarmult(G, sk)
-print("sk = %x" % sk)
-print("pk = (%x, %x)" % (PK[0], PK[1]))
+print("q  = {}".format(q))
+print("l  = {}".format(l))
 
 # string to byte array
 msg = str("0000").encode('utf-8')
 
-# -- sign
+# -- schnorr sign 
+x = 5
+print("x = {}".format(x))
+Y = scalarmult(G, -x)
+print("Y  = ({0}, {1})".format(Y[0], Y[1]))
+r = 2
+print("r  = {}".format(r))
+U = scalarmult(G, r) 
+u = U[0]
 
-# STEP1
-nonce = 2
-print("nonce = %d" % nonce)
-R = scalarmult(G, nonce) 
-r = R[0] % l
-# STEP2  check r is not 0
-#   not implement
-# STEP3
+# int to byte array
+u_ba = encodeint(u)
+e_digest = hashlib.sha256(u_ba + msg).digest()
+e = decodeint(e_digest)
+v = (r + x * e) % l
 
-msg_digest = hashlib.sha256(msg).digest()
-print("msg_digest:" + msg_digest.hex())
-msg_i = decodeint(msg_digest)
-print("msg_i:" + str(msg_i))
-s = (inv(nonce,l) * (msg_i + r * sk)) % l
-# STEP4  check s is not 0
-#   not implement
-
-print("r = %d" % r)
-print("r = 0x%x" % r)
-print("s = %d" % s)
-print("s = 0x%x" % s)
+print("e  = {}".format(e))
+print("v  = {}".format(v))
 
 # -- verify
-si = inv(s,l)
-u1 = (msg_i * si) % l
-u2 = (r * si) % l
-V = add_pt(scalarmult(G, u1), scalarmult(PK, u2)) 
-print("V = (%d, %d)" % (V[0], V[1]))
-result = (((V[0] - r) % l) == 0)
+UD = add_pt(scalarmult(G, v), scalarmult(Y, e))
+ud = UD[0] % l
+ud_ba = encodeint(ud)
 
-print("result %d" % result)
+ed_digest = hashlib.sha256(ud_ba + msg).digest()
+ed = decodeint(ed_digest)
+print("ed = {}".format(ed))
+
+print("result {}".format(e == ed))
+
