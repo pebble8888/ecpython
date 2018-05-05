@@ -113,6 +113,7 @@ print("msg_digest:" + msg_digest.hex())
 msg_i = decodeint(msg_digest)
 print("msg_i:" + str(msg_i))
 s = (inv(nonce,l) * (msg_i + r * sk)) % l
+ss = l - s
 # STEP4  check s is not 0
 #   not implement
 
@@ -120,9 +121,13 @@ print("r = %d" % r)
 print("r = 0x%x" % r)
 print("s = %d" % s)
 print("s = 0x%x" % s)
+print("ss = %d" % ss)
+print("ss = 0x%x" % ss)
+
 
 # -- verify
 si = inv(s,l)
+print("si %d" % si)
 u1 = (msg_i * si) % l
 u2 = (r * si) % l
 V = add_pt(scalarmult(G, u1), scalarmult(PK, u2)) 
@@ -130,3 +135,14 @@ print("V = (%d, %d)" % (V[0], V[1]))
 result = (((V[0] - r) % l) == 0)
 
 print("result %d" % result)
+
+si_s = inv(ss,l)
+print("si_s %d" % si_s)
+u1_s = (msg_i * si_s) % l
+u2_s = (r * si_s) % l
+V_s = add_pt(scalarmult(G, u1_s), scalarmult(PK, u2_s))
+print("V_s = (%d, %d)" % (V[0], V[1]))
+result_s = (((V_s[0] - r) % l) == 0)
+
+print("result_s %d" % result_s)
+
