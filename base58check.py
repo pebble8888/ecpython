@@ -3,7 +3,7 @@
 import base58
 import hashlib
 
-# version: 1 byte
+# version: bytes
 # payload: bytes
 def b58check(version, payload):
     d = version + payload 
@@ -18,6 +18,8 @@ m = hashlib.new('ripemd160')
 m.update(d)
 ba = m.digest()
 
-r1 = b58check(bytes.fromhex("00"), ba) 
+r1 = b58check(bytes.fromhex("6f"), ba) 
 print(r1)
+
+
 
