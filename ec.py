@@ -1,11 +1,5 @@
 #!/usr/bin/env python 
 
-gp = 11 
-
-#%matplotlib inline 
-#import matplotlib
-#matplotlib.use('TkAgg')
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -33,6 +27,8 @@ class Point:
         return Point(-1, -1)
 
 class EC:
+    # y^2 = x^3 + a * x^2 + b * x + c
+    # mod p
     def __init__(self, a, b, c, p):
         self.a = a
         self.b = b
@@ -98,51 +94,55 @@ class EC:
             x3 = (lm ** 2) - self.a - x1 - x2
             y3 = -(lm*(x3-x1) + y1)
 
-        q = Point(x3 , y3)
+        q = Point(x3, y3)
         q2 = Point(x3 % self.p, y3 % self.p)
         if not self.oncurve(q2):
             print("p1 {0} p2 {1} q {2} q2 {3}".format(p1.desc(), p2.desc(), q.desc(), q2.desc()))
             assert False
         return q2
 
-    def mul(self, p, n):
-        q = p
+    # pt: Point
+    # n : int
+    def mul(self, pt, n):
+        t_pt = pt
         for i in range(n-1):
-            q = ec.plus(q, p)
-        return q
+            t_pt = self.plus(t_pt, pt)
+        return t_pt
 
-ec = EC(0, 0, 7, gp)
+if __name__ == '__main__':
+    gp = 11 
+    ec = EC(0, 0, 7, gp)
 
-print ("F" + str(ec.p))
-m3 = ec.p % 3
-print ("p mod 3 is " + str(m3))
-#print ("d:" + str(ec.d()))
-print ("j:" + str(ec.d()))
-print ("#EC:" + str(ec.order))
-print ("")
+    print("F" + str(ec.p))
+    m3 = ec.p % 3
+    print("p mod 3 is " + str(m3))
+    #print ("d:" + str(ec.d()))
+    print("j:" + str(ec.d()))
+    print("#EC:" + str(ec.order))
+    print("")
 
-plotx = [p.x for p in ec.points]
-ploty = [p.y for p in ec.points]
-n = ["P"+str(i+1) for (i, p) in zip(range(len(ec.points)), ec.points)]
+    plotx = [p.x for p in ec.points]
+    ploty = [p.y for p in ec.points]
+    n = ["P"+str(i+1) for (i, p) in zip(range(len(ec.points)), ec.points)]
 
-for i in range(ec.points_count):
-    baseP = ec.points[i]
-    # print "P"+str(i+1)+":" + baseP.desc()
-    for j in range(2, ec.order+1):
-        p = ec.mul(baseP, j)
-        #print str(j)+"*P"+str(i+1)+":"+p.desc()
-        if p.iszero():
-            #print "order:{0}".format(j)
-            zz = 0
-        if (p == baseP):
-            #print ""
-            break
-    #print ""
-    
-fig, ax = plt.subplots()
-ax.scatter(plotx, ploty)
+    for i in range(ec.points_count):
+        baseP = ec.points[i]
+        # print "P"+str(i+1)+":" + baseP.desc()
+        for j in range(2, ec.order+1):
+            p = ec.mul(baseP, j)
+            #print str(j)+"*P"+str(i+1)+":"+p.desc()
+            if p.iszero():
+                #print "order:{0}".format(j)
+                zz = 0
+            if (p == baseP):
+                #print ""
+                break
+        #print ""
+        
+    fig, ax = plt.subplots()
+    ax.scatter(plotx, ploty)
 
-for i, txt in enumerate(n):
-    ax.annotate(txt, (plotx[i],ploty[i]))
+    for i, txt in enumerate(n):
+        ax.annotate(txt, (plotx[i],ploty[i]))
 
-plt.show()
+    plt.show()
