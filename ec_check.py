@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-ec = EC(0, 0, 7, 31)
+ec = EC(0, 0, 7, 97)
 
 print("F" + str(ec.p))
 print("#EC:" + str(ec.order))
