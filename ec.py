@@ -118,7 +118,7 @@ if __name__ == '__main__':
     print("p mod 3 is " + str(m3))
     #print ("d:" + str(ec.d()))
     print("j:" + str(ec.d()))
-    print("#EC:" + str(ec.order))
+    print("#E:" + str(ec.order))
     print("")
 
     plotx = [p.x for p in ec.points]
