@@ -1,11 +1,11 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3 
 
 import numpy as np
 import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-ec = EC(0, 0, 7, 97)
+ec = EC(0, 0, 7, 17)
 
 print("F" + str(ec.p))
 print("#EC:" + str(ec.order))
@@ -24,9 +24,25 @@ for i in range(ec.points_count):
         if p.iszero():
             print("order:{0}".format(j))
             print("")
-        if (p == baseP):
+        if p.is_equal(baseP):
             print("")
             break
+
+for i in range(ec.points_count):
+    for j in range(i+1, ec.points_count):
+        pt1 = ec.points[i]
+        pt2 = ec.points[j]
+        pt3 = ec.plus(pt1, pt2)
+        index = -1
+        for k in range(ec.points_count):
+            if ec.points[k].is_equal(pt3):
+                index = k
+                break
+        if index == -1:
+            s = "O"
+        else:
+            s = "P"+str(index+1) 
+        print("P"+str(i+1) + "+P"+str(j+1)+"="+s)
     
 fig, ax = plt.subplots()
 ax.scatter(plotx, ploty)
@@ -34,3 +50,4 @@ ax.scatter(plotx, ploty)
 for i, txt in enumerate(n):
     ax.annotate(txt, (plotx[i],ploty[i]))
 
+plt.show()
