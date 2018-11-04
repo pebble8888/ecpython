@@ -110,7 +110,7 @@ class EC:
         return t_pt
 
 if __name__ == '__main__':
-    gp = 11 
+    gp = 17
     ec = EC(0, 0, 7, gp)
 
     print("F" + str(ec.p))
@@ -120,6 +120,13 @@ if __name__ == '__main__':
     print("j:" + str(ec.d()))
     print("#E:" + str(ec.order))
     print("")
+
+    for i in range(1, ec.order):
+        print(str(i) + " torsion Point:")
+        for j in range(ec.points_count):
+            p = ec.mul(ec.points[j], i)
+            if p.iszero():
+                print(" P" + str(j+1))
 
     plotx = [p.x for p in ec.points]
     ploty = [p.y for p in ec.points]
