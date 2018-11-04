@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +21,12 @@ class Point:
         
     def iszero(self):
         return self.x == -1 and self.y == -1
+
+    def __eq__(self, other):
+        return self.is_equal(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
     
     @staticmethod
     def zero():
@@ -121,12 +127,16 @@ if __name__ == '__main__':
     print("#E:" + str(ec.order))
     print("")
 
+    #points = []
     for i in range(1, ec.order):
         print(str(i) + " torsion Point:")
         for j in range(ec.points_count):
             p = ec.mul(ec.points[j], i)
+            #if p.iszero() and ec.points[j] not in points:
             if p.iszero():
                 print(" P" + str(j+1))
+                #points.append(ec.points[j])
+
 
     plotx = [p.x for p in ec.points]
     ploty = [p.y for p in ec.points]
@@ -134,17 +144,12 @@ if __name__ == '__main__':
 
     for i in range(ec.points_count):
         baseP = ec.points[i]
-        # print "P"+str(i+1)+":" + baseP.desc()
         for j in range(2, ec.order+1):
             p = ec.mul(baseP, j)
-            #print str(j)+"*P"+str(i+1)+":"+p.desc()
             if p.iszero():
-                #print "order:{0}".format(j)
                 zz = 0
             if (p == baseP):
-                #print ""
                 break
-        #print ""
         
     fig, ax = plt.subplots()
     ax.scatter(plotx, ploty)
