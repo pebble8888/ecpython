@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-ec = EC(0, 0, 7, 17)
+gp = 11
+ec = EC(0, -7, 6, gp)
 
 print("F" + str(ec.p))
 print("#EC:" + str(ec.order))
@@ -29,7 +30,7 @@ for i in range(ec.points_count):
             break
 
 for i in range(ec.points_count):
-    for j in range(i+1, ec.points_count):
+    for j in range(i, ec.points_count):
         pt1 = ec.points[i]
         pt2 = ec.points[j]
         pt3 = ec.plus(pt1, pt2)

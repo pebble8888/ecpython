@@ -116,8 +116,9 @@ class EC:
         return t_pt
 
 if __name__ == '__main__':
-    gp = 17
-    ec = EC(0, 0, 7, gp)
+    gp = 31
+    #gp = 19
+    ec = EC(0, -7, 6, gp)
 
     print("F" + str(ec.p))
     m3 = ec.p % 3
@@ -128,7 +129,7 @@ if __name__ == '__main__':
     print("")
 
     #points = []
-    for i in range(1, ec.order):
+    for i in range(1, ec.order+1):
         print(str(i) + " torsion Point:")
         for j in range(ec.points_count):
             p = ec.mul(ec.points[j], i)
@@ -157,4 +158,4 @@ if __name__ == '__main__':
     for i, txt in enumerate(n):
         ax.annotate(txt, (plotx[i],ploty[i]))
 
-    plt.show()
+    #plt.show()
