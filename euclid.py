@@ -140,27 +140,27 @@ def lcm(a, b):
 #u = Unit(3, 2)
 #print(u)
 
-p = Pol([Unit(-1, 0), Unit(1, 5)])
+p = Pol([Unit(1, 361), Unit(-1, 1)])
 print("P = " + str(p))
 
 q = Pol([Unit(1, 3), Unit(2, 1), Unit(1, 0)])
 print("Q = " + str(q))
 
-r = p * q
-print("P * Q = " + str(r))
+#r = p * q
+#print("P * Q = " + str(r))
 
-s = p % q
-print("P mod Q = " + str(s))
+#s = p % q
+#print("P mod Q = " + str(s))
 
-u = Pol([Unit(1, 8), Unit(2, 6), Unit(1, 5), Unit(-1, 3), Unit(-2, 1), Unit(-1, 0)])
-print("U = " + str(u))
+#u = Pol([Unit(1, 8), Unit(2, 6), Unit(1, 5), Unit(-1, 3), Unit(-2, 1), Unit(-1, 0)])
+#print("U = " + str(u))
 
-v = u % q
-print("U mod Q = " + str(v))
+v = p % q
+print("P mod Q = " + str(v))
 
-print("U.is_gcd_one(Q) = " + str(u.is_gcd_one(q))) 
+#print("U.is_gcd_one(Q) = " + str(u.is_gcd_one(q))) 
 
-w = Pol([Unit(1, 9)])
-print("W = " + str(w))
-print("W.is_gcd_one(Q) = " + str(w.is_gcd_one(q)))
+#w = Pol([Unit(1, 9)])
+#print("W = " + str(w))
+#print("W.is_gcd_one(Q) = " + str(w.is_gcd_one(q)))
 
