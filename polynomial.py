@@ -4,8 +4,7 @@ import operator
 from field import F 
 
 class Pol:
-    def __init__(self, p, units):
-        self.p = p
+    def __init__(self, units):
         self.units = units
         self.normalize()
 
@@ -20,43 +19,47 @@ class Pol:
                     break
             if not found:
                 l_units.append(u)
-        self.units = [x for x in l_units if not x.coef.iszero()]
+        for i in l_units:
+            i.normalize()
+        self.units = []
+        for x in l_units:
+            if type(x.coef) is F:
+                if not x.coef.iszero():
+                    self.units.append(x)
+            else:
+                if x.coef != 0:
+                    self.units.append(x)
         self.units.sort(key=operator.attrgetter('xpower'), reverse=True)
 
     def ec_reduction(self, a, b):
-        t = Pol.zero(self.p)
+        t = Pol.zero()
         for u in self.units:
             if u.ypower >= 2:
                 yy = u.ypower // 2
-                e = u.toPol(self.p) // Pol(self.p, [Unit(F(self.p, 1), 0, 2*yy)])
-                e = e * Pol(self.p, [Unit(F(self.p, 1), 3, 0), Unit(F(self.p, a), 1, 0), Unit(F(self.p, b), 0, 0)]).power(yy)
+                e = Pol([u]) // Pol([Unit(1, 0, 2*yy)])
+                e = e * Pol([Unit(1, 3, 0), Unit(a, 1, 0), Unit(b, 0, 0)]).power(yy)
             else:
-                e = u.toPol(self.p)
+                e = Pol([u])
             t = t + e
         t.normalize()
         return t
 
     def highestUnitX(self):
-        unit = Unit(F(self.p, 0), 0, 0) 
+        unit = Unit(0, 0, 0) 
         for u in self.units:
             if unit.xpower < u.xpower:
                 unit = u
         return unit
 
     def __add__(self, other):
-        #l_units = self.units
-        #l_units.extend(other.units)  
         self.units.extend(other.units)  
+        self.normalize()
         return self
-        #return Pol(self.p, self.units)
     
     def __sub__(self, other):
-        #l_units = self.units
-        #for i in other.units:
-        #    l_units.append(-i)
-        #return Pol(self.p, l_units)
         for i in other.units:
-            self.units.append(i)
+            self.units.append(-i)
+        self.normalize()
         return self
 
     def __mul__(self, other):
@@ -64,13 +67,14 @@ class Pol:
         for i in self.units:
             for j in other.units:
                 l_units.append(i * j)
-        return Pol(self.p, l_units)
+        return Pol(l_units)
 
     def power(self, other):
         assert(other != 0)
+        l = self
         for i in range(other-1):
-            self = self * self 
-        return self
+            l = l * self 
+        return l 
 
     def __floordiv__(self, other):
         if len(other.units) == 0:
@@ -79,7 +83,7 @@ class Pol:
             l_units = [] 
             for i in self.units:
                 l_units.append(i // other.units[0])
-            return Pol(self.p, l_units)
+            return Pol(l_units)
         else:
             assert(False) 
 
@@ -92,8 +96,9 @@ class Pol:
             tmp_h = tmp.highestUnitX()
             if tmp_h.xpower < o_h.xpower:
                 break
-            p = Pol(self.p, [Unit(tmp_h.coef // o_h.coef, tmp_h.xpower - o_h.xpower, 0)])
-            tmp = tmp - p * other
+            q = Pol([Unit(tmp_h.coef // o_h.coef, tmp_h.xpower - o_h.xpower, 0)])
+            tmp = tmp - q * other
+            tmp.normalize()
         return tmp
 
     def iszero(self):
@@ -117,8 +122,8 @@ class Pol:
         return s.strip(" + ")
 
     @staticmethod
-    def zero(prime):
-        return Pol(prime, [])
+    def zero():
+        return Pol([])
 
 class Unit:
     def __init__(self, coef, xpower, ypower): 
@@ -126,11 +131,20 @@ class Unit:
         self.xpower = xpower
         self.ypower = ypower
 
+    def normalize(self):
+        if type(self.coef) is F:
+            self.coef.normalize()
+
     def __str__(self):
         if self.xpower == 0 and self.ypower == 0:
             return str(self.coef)
-        if self.coef.iszero():
-            return ""
+        if type(self.coef) is F:
+            if self.coef.iszero():
+                return ""
+        else:
+            if self.coef == 0:
+                return ""
+
         s = str(self.coef) 
         if self.xpower == 1:
             s += "x"
@@ -164,8 +178,8 @@ class Unit:
     def iszero(self):
         return self.coef.iszero()
 
-    def toPol(self, prime):
-        return Pol(prime, [self])
+    #def toPol(self, prime):
+    #    return Pol(prime, [self])
 
     @staticmethod
     def zero(prime):
@@ -179,19 +193,19 @@ if __name__ == '__main__':
     #u = Unit(3, 2)
     #print(u)
 
-    p = Pol(19, [Unit(F(19, 2), 5, 0), Unit(F(19, -1), 1, 0)])
+    p = Pol([Unit(F(19, 2), 5, 0), Unit(F(19, -1), 1, 0)])
     print("P=" + str(p))
 
-    q = Pol(19, [Unit(F(19, 3), 3, 0), Unit(F(19, 2), 1, 0), Unit(F(19, 1), 0, 0)])
+    q = Pol([Unit(F(19, 3), 3, 0), Unit(F(19, 2), 1, 0), Unit(F(19, 1), 0, 0)])
     print("Q=" + str(q))
 
     v = p % q
     print("P mod Q =" + str(v))
 
-    r = Pol(19, [Unit(F(19, 3), 3, 2), Unit(F(19, 5), 0, 1)])
+    r = Pol([Unit(F(19, 3), 3, 2), Unit(F(19, 5), 0, 1)])
     print("R=" + str(r))
 
-    s = Pol(19, [Unit(F(19, 2), 1, 1), Unit(F(19, 1), 0, 0)])
+    s = Pol([Unit(F(19, 2), 1, 1), Unit(F(19, 1), 0, 0)])
     print("S=" + str(s))
 
     x = r * s

@@ -102,35 +102,48 @@ class EC:
     def psi(self, n):
         assert(n >= 0)
         if n == 0:
-            return Pol.zero(self.p)
+            return Pol.zero()
         elif n == 1:
-            return Pol(self.p, [Unit(F(self.p, 1), 0, 0)])
+            return Pol([Unit(1, 0, 0)])
         elif n == 2:
-            return Pol(self.p, [Unit(F(self.p, 2), 0, 1)])
+            return Pol([Unit(2, 0, 1)])
         elif n == 3:
-            return Pol(self.p, [Unit(F(self.p, 3), 4, 0), \
-                                Unit(F(self.p, 6 * self.a), 2, 0), \
-                                Unit(F(self.p, 12 * self.b), 1, 0), \
-                                Unit(F(self.p, - self.a ** 2), 0, 0)]) 
+            return Pol([Unit(3, 4, 0), \
+                        Unit(6 * self.a, 2, 0), \
+                        Unit(12 * self.b, 1, 0), \
+                        Unit(- self.a ** 2, 0, 0)]) 
         elif n == 4:
-            return Pol(self.p, [Unit(F(self.p, 4), 0, 1)]) * \
-                   Pol(self.p, [Unit(F(self.p, 1), 6, 0), \
-                                Unit(F(self.p, 5 * self.a), 4, 0), \
-                                Unit(F(self.p, 20 * self.b), 3, 0), \
-                                Unit(F(self.p, -5 * (self.a **2)), 2, 0), \
-                                Unit(F(self.p, -4 * self.a * self.b), 1, 0), \
-                                Unit(F(self.p, -8 * (self.b ** 2) - (self.a ** 3)), 0, 0)])
+            return Pol([Unit(4, 0, 1)]) * \
+                   Pol([Unit(1, 6, 0), \
+                        Unit(5 * self.a, 4, 0), \
+                        Unit(20 * self.b, 3, 0), \
+                        Unit(-5 * (self.a **2), 2, 0), \
+                        Unit(-4 * self.a * self.b, 1, 0), \
+                        Unit(-8 * (self.b ** 2) - (self.a ** 3), 0, 0)])
         elif n % 2 == 1:
             m = (n-1)//2
-            r = copy.deepcopy(self).psi(m+2) * copy.deepcopy(self).psi(m).power(3) \
-                   - copy.deepcopy(self).psi(m-1) * copy.deepcopy(self).psi(m+1).power(3)
+            e = copy.deepcopy(self).psi(m+2) 
+            f = copy.deepcopy(self).psi(m).power(3)
+            g = copy.deepcopy(self).psi(m-1)
+            h = copy.deepcopy(self).psi(m+1).power(3)
+            #print("e="+str(e))
+            #print("f="+str(f))
+            #print("g="+str(g))
+            #print("h="+str(h))
+            r = e*f - g*h
             return r.ec_reduction(self.a, self.b)
         else:
             m = n//2
-            e = copy.deepcopy(self).psi(m) * \
-                (copy.deepcopy(self).psi(m+2) * copy.deepcopy(self).psi(m-1).power(2) \
-                - copy.deepcopy(self).psi(m-2) * copy.deepcopy(self).psi(m+1).power(2))
-            r = e // Pol(self.p, [Unit(F(self.p, 2), 0, 1)])
+            e = copy.deepcopy(self).psi(m+2) 
+            f = copy.deepcopy(self).psi(m-1).power(2)
+            g = copy.deepcopy(self).psi(m-2)
+            h = copy.deepcopy(self).psi(m+1).power(2)
+            #print("e="+str(e))
+            #print("f="+str(f))
+            #print("g="+str(g))
+            #print("h="+str(h))
+            i = copy.deepcopy(self).psi(m) * (e*f - g*h)
+            r = i // Pol([Unit(2, 0, 1)])
             return r.ec_reduction(self.a, self.b)
 
     def phi(self, n):
