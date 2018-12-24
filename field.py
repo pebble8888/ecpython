@@ -30,6 +30,8 @@ class F:
 
     def __floordiv__(self, other):
         assert(self.p == other.p)
+        if self.v % other.v == 0:
+            return F(self.p, self.v // other.v)
         return F(self.p, self.v * (other.v ** (self.p-2)))
 
     def __mod__(self, other):

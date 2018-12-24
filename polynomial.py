@@ -23,6 +23,19 @@ class Pol:
         self.units = [x for x in l_units if not x.coef.iszero()]
         self.units.sort(key=operator.attrgetter('xpower'), reverse=True)
 
+    def ec_reduction(self, a, b):
+        t = Pol.zero(self.p)
+        for u in self.units:
+            if u.ypower >= 2:
+                yy = u.ypower // 2
+                e = u.toPol(self.p) // Pol(self.p, [Unit(F(self.p, 1), 0, 2*yy)])
+                e = e * Pol(self.p, [Unit(F(self.p, 1), 3, 0), Unit(F(self.p, a), 1, 0), Unit(F(self.p, b), 0, 0)]).power(yy)
+            else:
+                e = u.toPol(self.p)
+            t = t + e
+        t.normalize()
+        return t
+
     def highestUnitX(self):
         unit = Unit(F(self.p, 0), 0, 0) 
         for u in self.units:
@@ -31,15 +44,20 @@ class Pol:
         return unit
 
     def __add__(self, other):
-        l_units = self.units
-        l_units.extend(other.units)  
-        return Pol(self.p, l_units)
+        #l_units = self.units
+        #l_units.extend(other.units)  
+        self.units.extend(other.units)  
+        return self
+        #return Pol(self.p, self.units)
     
     def __sub__(self, other):
-        l_units = self.units
+        #l_units = self.units
+        #for i in other.units:
+        #    l_units.append(-i)
+        #return Pol(self.p, l_units)
         for i in other.units:
-            l_units.append(-i)
-        return Pol(self.p, l_units)
+            self.units.append(i)
+        return self
 
     def __mul__(self, other):
         l_units = []
@@ -47,6 +65,23 @@ class Pol:
             for j in other.units:
                 l_units.append(i * j)
         return Pol(self.p, l_units)
+
+    def power(self, other):
+        assert(other != 0)
+        for i in range(other-1):
+            self = self * self 
+        return self
+
+    def __floordiv__(self, other):
+        if len(other.units) == 0:
+            assert(False)
+        elif len(other.units) == 1:
+            l_units = [] 
+            for i in self.units:
+                l_units.append(i // other.units[0])
+            return Pol(self.p, l_units)
+        else:
+            assert(False) 
 
     def __mod__(self, other):
         assert(not self.hasY())
@@ -80,6 +115,10 @@ class Pol:
         for u in self.units:
             s += " + " + str(u)  
         return s.strip(" + ")
+
+    @staticmethod
+    def zero(prime):
+        return Pol(prime, [])
 
 class Unit:
     def __init__(self, coef, xpower, ypower): 
@@ -124,6 +163,13 @@ class Unit:
 
     def iszero(self):
         return self.coef.iszero()
+
+    def toPol(self, prime):
+        return Pol(prime, [self])
+
+    @staticmethod
+    def zero(prime):
+        return Pol(prime, [])
 
 if __name__ == '__main__':
 

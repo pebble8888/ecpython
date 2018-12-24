@@ -3,7 +3,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from polynomial import Pol 
+from polynomial import Unit
 from field import F
+import copy
 
 class Point:
     # x, y is Field
@@ -35,6 +37,7 @@ class Point:
 class EC:
     # y^2 = x^3 + a * x + b
     # mod p
+    # a, b, p: int
     def __init__(self, a, b, p):
         self.a = a
         self.b = b
@@ -55,7 +58,6 @@ class EC:
         l = pt.y.v**2
         r = pt.x.v**3 + self.a *pt.x.v + self.b
         return F(self.p, l) == F(self.p, r)
-
     
     def inverse(self, a):
         assert self.p >= 2
@@ -97,7 +99,48 @@ class EC:
             t_pt = self.plus(t_pt, pt)
         return t_pt
 
+    def psi(self, n):
+        assert(n >= 0)
+        if n == 0:
+            return Pol.zero(self.p)
+        elif n == 1:
+            return Pol(self.p, [Unit(F(self.p, 1), 0, 0)])
+        elif n == 2:
+            return Pol(self.p, [Unit(F(self.p, 2), 0, 1)])
+        elif n == 3:
+            return Pol(self.p, [Unit(F(self.p, 3), 4, 0), \
+                                Unit(F(self.p, 6 * self.a), 2, 0), \
+                                Unit(F(self.p, 12 * self.b), 1, 0), \
+                                Unit(F(self.p, - self.a ** 2), 0, 0)]) 
+        elif n == 4:
+            return Pol(self.p, [Unit(F(self.p, 4), 0, 1)]) * \
+                   Pol(self.p, [Unit(F(self.p, 1), 6, 0), \
+                                Unit(F(self.p, 5 * self.a), 4, 0), \
+                                Unit(F(self.p, 20 * self.b), 3, 0), \
+                                Unit(F(self.p, -5 * (self.a **2)), 2, 0), \
+                                Unit(F(self.p, -4 * self.a * self.b), 1, 0), \
+                                Unit(F(self.p, -8 * (self.b ** 2) - (self.a ** 3)), 0, 0)])
+        elif n % 2 == 1:
+            m = (n-1)//2
+            r = copy.deepcopy(self).psi(m+2) * copy.deepcopy(self).psi(m).power(3) \
+                   - copy.deepcopy(self).psi(m-1) * copy.deepcopy(self).psi(m+1).power(3)
+            return r.ec_reduction(self.a, self.b)
+        else:
+            m = n//2
+            e = copy.deepcopy(self).psi(m) * \
+                (copy.deepcopy(self).psi(m+2) * copy.deepcopy(self).psi(m-1).power(2) \
+                - copy.deepcopy(self).psi(m-2) * copy.deepcopy(self).psi(m+1).power(2))
+            r = e // Pol(self.p, [Unit(F(self.p, 2), 0, 1)])
+            return r.ec_reduction(self.a, self.b)
+
+    def phi(self, n):
+        assert(n >= 0)
+
+    def omega(self, n):
+        assert(n >= 0)
+
 if __name__ == '__main__':
+    """
     gp = 11
     ec = EC(-7, 6, gp)
 
@@ -134,3 +177,14 @@ if __name__ == '__main__':
         ax.annotate(txt, (plotx[i],ploty[i]))
 
     #plt.show()
+    """
+
+    #ec = EC(-7, 6, 19)
+    ec = EC(1, 1, 19)
+    print(ec.psi(0))
+    print(ec.psi(1))
+    print(ec.psi(2))
+    print(ec.psi(3))
+    print(ec.psi(4))
+    print(ec.psi(5))
+    print(ec.psi(6))

@@ -3,7 +3,7 @@
 from ec import EC 
 from ec import Point
 
-ec = EC(0, 0, 7, 31)
+ec = EC(0, 7, 31)
 print("order:" + str(ec.order))
 G = Point(1, 15)
 print("G:" + G.desc())

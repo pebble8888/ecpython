@@ -3,5 +3,5 @@
 from polynomial import Pol
 from ec import EC 
 
-e1 = EC(0, 2, 1, 19)
+e1 = EC(2, 1, 19)
 
