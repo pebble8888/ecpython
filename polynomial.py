@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import operator
+from field import F 
 
 class Pol:
-    def __init__(self, units):
+    def __init__(self, p, units):
+        self.p = p
         self.units = units
         self.normalize()
 
@@ -12,50 +14,51 @@ class Pol:
         for u in self.units:
             found = False
             for l_u in l_units:
-                if u.power == l_u.power:
+                if u.xpower == l_u.xpower and u.ypower == l_u.ypower:
                     l_u.coef += u.coef
                     found = True
                     break
             if not found:
                 l_units.append(u)
-        self.units = [x for x in l_units if x.coef != 0]
-        self.units.sort(key=operator.attrgetter('power'), reverse=True)
+        self.units = [x for x in l_units if not x.coef.iszero()]
+        self.units.sort(key=operator.attrgetter('xpower'), reverse=True)
 
-    def highestUnit(self):
-        unit = Unit(0, 0) 
+    def highestUnitX(self):
+        unit = Unit(F(self.p, 0), 0, 0) 
         for u in self.units:
-            if unit.power < u.power:
+            if unit.xpower < u.xpower:
                 unit = u
         return unit
 
     def __add__(self, other):
         l_units = self.units
         l_units.extend(other.units)  
-        return Pol(l_units)
+        return Pol(self.p, l_units)
     
     def __sub__(self, other):
         l_units = self.units
         for i in other.units:
             l_units.append(-i)
-        return Pol(l_units)
+        return Pol(self.p, l_units)
 
     def __mul__(self, other):
         l_units = []
         for i in self.units:
             for j in other.units:
                 l_units.append(i * j)
-        return Pol(l_units)
+        return Pol(self.p, l_units)
 
     def __mod__(self, other):
-        o_h = other.highestUnit()
-        assert(o_h.coef == 1)
+        assert(not self.hasY())
+        assert(not other.hasY())
+        o_h = other.highestUnitX()
         tmp = self
         while True:
-            tmp_h = tmp.highestUnit()
-            if tmp_h.power < o_h.power:
+            tmp_h = tmp.highestUnitX()
+            if tmp_h.xpower < o_h.xpower:
                 break
-            p = Pol([Unit(tmp_h.coef, tmp_h.power - o_h.power)])
-            tmp = tmp - p * other  
+            p = Pol(self.p, [Unit(tmp_h.coef // o_h.coef, tmp_h.xpower - o_h.xpower, 0)])
+            tmp = tmp - p * other
         return tmp
 
     def iszero(self):
@@ -63,6 +66,12 @@ class Pol:
 
     def is_gcd_one(self, other):
         return (self % other).iszero()
+
+    def hasY(self):
+        for u in self.units:
+            if not u.ypower == 0:
+                return True
+        return False
 
     def __str__(self):
         if self.iszero():
@@ -73,70 +82,73 @@ class Pol:
         return s.strip(" + ")
 
 class Unit:
-    def __init__(self, coef, power): 
+    def __init__(self, coef, xpower, ypower): 
         self.coef = coef
-        self.power = power
+        self.xpower = xpower
+        self.ypower = ypower
 
     def __str__(self):
-        if self.power == 0:
-            return str(self.coef)     
-        s = ""
-        if self.coef != 1:
-            s += str(self.coef) 
-        if self.power == 1:
+        if self.xpower == 0 and self.ypower == 0:
+            return str(self.coef)
+        if self.coef.iszero():
+            return ""
+        s = str(self.coef) 
+        if self.xpower == 1:
             s += "x"
-        else:
-            s += "x^"+str(self.power)
+        elif self.xpower > 1:
+            s += "x^"+str(self.xpower)
+        if self.ypower == 1:
+            s += "y"
+        elif self.ypower > 1:
+            s += "y^"+str(self.ypower)
         return s
 
     def __add__(self, other):
-        assert(self.power == other.power)
-        return Unit(self.coef + other.coef, self.power)
+        if self.xpower == other.xpower and self.ypower == other.ypower:
+            return Unit(self.coef + other.coef, self.xpower)
+        return [self, other]
 
     def __sub__(self, other):
-        assert(self.power == other.power)
-        return Unit(self.coef - other.coef, self.power)
+        if self.xpower == other.xpower and self.ypower == other.ypower:
+            return Unit(self.coef - other.coef, self.xpower, self.ypower)
+        return [self, -other]
 
     def __neg__(self):
-        return Unit(- self.coef, self.power) 
+        return Unit(- self.coef, self.xpower, self.ypower) 
 
     def __mul__(self, other):
-        return Unit(self.coef * other.coef, self.power + other.power)
+        return Unit(self.coef * other.coef, self.xpower + other.xpower, self.ypower + other.ypower)
 
     def __floordiv__(self, other):
-        return Unit(self.coef // other.coef, self.power - other.power)
+        return Unit(self.coef // other.coef, self.xpower - other.xpower, self.ypower - other.ypower)
 
     def iszero(self):
-        return self.coef == 0
+        return self.coef.iszero()
 
+if __name__ == '__main__':
 
-#d = lcm(2, 3)
-#print(d)
+    #d = lcm(2, 3)
+    #print(d)
 
-#u = Unit(3, 2)
-#print(u)
+    #u = Unit(3, 2)
+    #print(u)
 
-p = Pol([Unit(1, 361), Unit(-1, 1)])
-print("P = " + str(p))
+    p = Pol(19, [Unit(F(19, 2), 5, 0), Unit(F(19, -1), 1, 0)])
+    print("P=" + str(p))
 
-q = Pol([Unit(1, 3), Unit(2, 1), Unit(1, 0)])
-print("Q = " + str(q))
+    q = Pol(19, [Unit(F(19, 3), 3, 0), Unit(F(19, 2), 1, 0), Unit(F(19, 1), 0, 0)])
+    print("Q=" + str(q))
 
-#r = p * q
-#print("P * Q = " + str(r))
+    v = p % q
+    print("P mod Q =" + str(v))
 
-#s = p % q
-#print("P mod Q = " + str(s))
+    r = Pol(19, [Unit(F(19, 3), 3, 2), Unit(F(19, 5), 0, 1)])
+    print("R=" + str(r))
 
-#u = Pol([Unit(1, 8), Unit(2, 6), Unit(1, 5), Unit(-1, 3), Unit(-2, 1), Unit(-1, 0)])
-#print("U = " + str(u))
+    s = Pol(19, [Unit(F(19, 2), 1, 1), Unit(F(19, 1), 0, 0)])
+    print("S=" + str(s))
 
-v = p % q
-print("P mod Q = " + str(v))
+    x = r * s
+    print("R * S =" + str(x))
 
-#print("U.is_gcd_one(Q) = " + str(u.is_gcd_one(q))) 
-
-#w = Pol([Unit(1, 9)])
-#print("W = " + str(w))
-#print("W.is_gcd_one(Q) = " + str(w.is_gcd_one(q)))
 

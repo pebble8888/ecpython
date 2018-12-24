@@ -2,43 +2,42 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from polynomial import Pol 
+from field import F
 
 class Point:
+    # x, y is Field
     def __init__(self, x, y):
         self.x = x
         self.y = y
     
-    def desc(self):
-        if self.x == -1 and self.y == -1:
+    def __str__(self):
+        if self.x.isinf() and self.y.isinf():
             return "O"
         return "("+str(self.x)+","+str(self.y)+")"
     
-    def is_equal(self, other):
-        return self.x == other.x and self.y == other.y
-
-    def is_equal_negative(self, other, prime):
-        return self.x == other.x and - self.y == other.y - prime
+    def is_equal_negative(self, other):
+        return self.x == other.x and self.y == - other.y
         
-    def iszero(self):
-        return self.x == -1 and self.y == -1
+    def isinf(self):
+        return self.x.isinf() and self.y.isinf()
 
     def __eq__(self, other):
-        return self.is_equal(other)
+        return self.x == other.x and self.y == other.y 
 
     def __ne__(self, other):
         return not self.__eq__(other)
     
     @staticmethod
-    def zero():
-        return Point(-1, -1)
+    def inf(prime):
+        return Point(F(prime, None), F(prime, None))
 
 class EC:
-    # y^2 = x^3 + a * x^2 + b * x + c
+    # y^2 = x^3 + a * x + b
     # mod p
-    def __init__(self, a, b, c, p):
+    def __init__(self, a, b, p):
         self.a = a
         self.b = b
-        self.c = c
         self.p = p
         self.calc_order()
     
@@ -46,69 +45,52 @@ class EC:
         self.points = []
         for x in range(self.p):
             for y in range(self.p):
-                pt = Point(x,y)
+                pt = Point(F(self.p, x),F(self.p, y))
                 if self.oncurve(pt):
                     self.points.append(pt)
         self.points_count = len(self.points)
         self.order = len(self.points)+1
 
     def oncurve(self, pt):
-        l = ((pt.y**2) % self.p)
-        r = ((pt.x**3) + self.a*(pt.x**2) + self.b*pt.x + self.c) % self.p
-        return l == r
+        l = pt.y.v**2
+        r = pt.x.v**3 + self.a *pt.x.v + self.b
+        return F(self.p, l) == F(self.p, r)
 
-    def d(self):
-        return -4*(self.a**3)*self.c \
-                + (self.a**2)*(self.b**2) \
-                + 18*self.a*self.b*self.c \
-                - 4*(self.b**3) \
-                - 27 * (self.c**2)
-                
-    def j(self):
-        dd = self.d
-        if (dd ==0):
-            return "invalid"
-        else:
-            return 4 * 1728 * (a**3) / dd
     
     def inverse(self, a):
         assert self.p >= 2
         return a ** (self.p-2)
     
     def plus(self, p1, p2):
-        x1 = p1.x
-        y1 = p1.y
-        x2 = p2.x
-        y2 = p2.y
-        if (p1.iszero()):
+        if p1.isinf():
             return p2
-        if (p2.iszero()):
+        if p2.isinf():
             return p1
-        
-        if p1.is_equal_negative(p2, self.p):
-            return Point.zero()
-        
-        elif p1.is_equal(p2):
-            if (y1 == 0):
-                return Point.zero()
+
+        x1 = p1.x.v
+        y1 = p1.y.v
+        x2 = p2.x.v
+        y2 = p2.y.v
+        if p1.is_equal_negative(p2):
+            return Point.inf(self.p)
+        elif p1 == p2:
+            if y1 == 0:
+                return Point.inf(self.p)
             else:
-                lm = (3 * (x1 **2) + 2 * self.a * x1 + self.b) * self.inverse(2 * y1)
-                x3 = (lm ** 2) - self.a - x1 - x2
+                lm = (3 * (x1 **2) + self.a) * self.inverse(2 * y1)
+                x3 = lm ** 2 - x1 - x2
                 y3 = - lm *(x3-x1) - y1
         else:
             lm = (y2-y1) * self.inverse(x2-x1)
-            x3 = (lm ** 2) - self.a - x1 - x2
+            x3 = lm ** 2 - x1 - x2
             y3 = -(lm*(x3-x1) + y1)
 
-        q = Point(x3, y3)
-        q2 = Point(x3 % self.p, y3 % self.p)
-        if not self.oncurve(q2):
-            print("p1 {0} p2 {1} q {2} q2 {3}".format(p1.desc(), p2.desc(), q.desc(), q2.desc()))
+        q = Point(F(self.p, x3), F(self.p, y3))
+        if not self.oncurve(q):
+            print("q=" + str(q))
             assert False
-        return q2
+        return q
 
-    # pt: Point
-    # n : int
     def mul(self, pt, n):
         t_pt = pt
         for i in range(n-1):
@@ -116,40 +98,33 @@ class EC:
         return t_pt
 
 if __name__ == '__main__':
-    gp = 31
-    #gp = 19
-    ec = EC(0, -7, 6, gp)
+    gp = 11
+    ec = EC(-7, 6, gp)
 
     print("F" + str(ec.p))
     m3 = ec.p % 3
     print("p mod 3 is " + str(m3))
-    #print ("d:" + str(ec.d()))
-    print("j:" + str(ec.d()))
     print("#E:" + str(ec.order))
     print("")
 
-    #points = []
     for i in range(1, ec.order+1):
         print(str(i) + " torsion Point:")
         for j in range(ec.points_count):
-            p = ec.mul(ec.points[j], i)
-            #if p.iszero() and ec.points[j] not in points:
-            if p.iszero():
+            pt = ec.mul(ec.points[j], i)
+            if pt.isinf():
                 print(" P" + str(j+1))
-                #points.append(ec.points[j])
 
-
-    plotx = [p.x for p in ec.points]
-    ploty = [p.y for p in ec.points]
+    plotx = [pt.x.v for pt in ec.points]
+    ploty = [pt.y.v for pt in ec.points]
     n = ["P"+str(i+1) for (i, p) in zip(range(len(ec.points)), ec.points)]
 
     for i in range(ec.points_count):
         baseP = ec.points[i]
         for j in range(2, ec.order+1):
-            p = ec.mul(baseP, j)
-            if p.iszero():
+            pt = ec.mul(baseP, j)
+            if pt.isinf():
                 zz = 0
-            if (p == baseP):
+            if pt == baseP:
                 break
         
     fig, ax = plt.subplots()

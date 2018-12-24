@@ -7,7 +7,8 @@ class F:
         self.normalize()
 
     def normalize(self):
-        self.v = self.v % self.p
+        if self.v is not None:
+            self.v = self.v % self.p
 
     def __add__(self, other):
         assert(self.p == other.p)
@@ -24,6 +25,9 @@ class F:
         assert(self.p == other.p)
         return F(self.p, self.v * other.v)
 
+    def __pow__(self, other):
+        return F(self.p, self.v ** other)
+
     def __floordiv__(self, other):
         assert(self.p == other.p)
         return F(self.p, self.v * (other.v ** (self.p-2)))
@@ -35,6 +39,16 @@ class F:
     def iszero(self):
         return self.v == 0
 
+    def isone(self):
+        return self.v == 1
+
+    def isinf(self):
+        return self.v is None
+
     def __str__(self):
         return str(self.v) 
+
+    def __eq__(self, other):
+        assert(self.p == other.p)
+        return self.v == other.v
 
