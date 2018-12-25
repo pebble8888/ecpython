@@ -122,27 +122,19 @@ class EC:
                         Unit(-8 * (self.b ** 2) - (self.a ** 3), 0, 0)])
         elif n % 2 == 1:
             m = (n-1)//2
-            e = copy.deepcopy(self).psi(m+2) 
-            f = copy.deepcopy(self).psi(m).power(3)
-            g = copy.deepcopy(self).psi(m-1)
-            h = copy.deepcopy(self).psi(m+1).power(3)
-            #print("e="+str(e))
-            #print("f="+str(f))
-            #print("g="+str(g))
-            #print("h="+str(h))
+            e = self.psi(m+2)
+            f = self.psi(m) ** 3
+            g = self.psi(m-1)
+            h = self.psi(m+1) ** 3
             r = e*f - g*h
             return r.ec_reduction(self.a, self.b)
         else:
             m = n//2
-            e = copy.deepcopy(self).psi(m+2) 
-            f = copy.deepcopy(self).psi(m-1).power(2)
-            g = copy.deepcopy(self).psi(m-2)
-            h = copy.deepcopy(self).psi(m+1).power(2)
-            #print("e="+str(e))
-            #print("f="+str(f))
-            #print("g="+str(g))
-            #print("h="+str(h))
-            i = copy.deepcopy(self).psi(m) * (e*f - g*h)
+            e = self.psi(m+2) 
+            f = self.psi(m-1) ** 2
+            g = self.psi(m-2)
+            h = self.psi(m+1) ** 2
+            i = self.psi(m) * (e*f - g*h)
             r = i // Pol([Unit(2, 0, 1)])
             return r.ec_reduction(self.a, self.b)
 
@@ -201,3 +193,6 @@ if __name__ == '__main__':
     print(ec.psi(4))
     print(ec.psi(5))
     print(ec.psi(6))
+    print(ec.psi(7))
+    print(ec.psi(8))
+

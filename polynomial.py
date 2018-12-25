@@ -37,7 +37,7 @@ class Pol:
             if u.ypower >= 2:
                 yy = u.ypower // 2
                 e = Pol([u]) // Pol([Unit(1, 0, 2*yy)])
-                e = e * Pol([Unit(1, 3, 0), Unit(a, 1, 0), Unit(b, 0, 0)]).power(yy)
+                e = e * Pol([Unit(1, 3, 0), Unit(a, 1, 0), Unit(b, 0, 0)]) ** yy
             else:
                 e = Pol([u])
             t = t + e
@@ -69,7 +69,7 @@ class Pol:
                 l_units.append(i * j)
         return Pol(l_units)
 
-    def power(self, other):
+    def __pow__(self, other):
         assert(other != 0)
         l = self
         for i in range(other-1):
