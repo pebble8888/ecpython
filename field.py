@@ -9,7 +9,6 @@ class F:
     def normalize(self):
         if self.v is not None:
             self.v = self.v % self.p
-        return self
 
     def __add__(self, other):
         assert(self.p == other.p)

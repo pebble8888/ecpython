@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-gp = 11
-ec = EC(-7, 6, gp)
+gp = 19
+ec = EC(2, 1, gp)
 
 print("F" + str(ec.p))
 print("#EC:" + str(ec.order))
@@ -29,6 +29,7 @@ for i in range(ec.points_count):
             print("")
             break
 
+"""
 for i in range(ec.points_count):
     for j in range(i, ec.points_count):
         pt1 = ec.points[i]
@@ -44,6 +45,7 @@ for i in range(ec.points_count):
         else:
             s = "P"+str(index+1) 
         print("P"+str(i+1) + "+P"+str(j+1)+"="+s)
+"""
     
 fig, ax = plt.subplots()
 ax.scatter(plotx, ploty)
