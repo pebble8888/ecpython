@@ -128,6 +128,7 @@ class EC:
             h = self.psi(m+1) ** 3
             r = e*f - g*h
             return r.ec_reduction(self.a, self.b)
+            #return r
         else:
             m = n//2
             e = self.psi(m+2) 
@@ -137,11 +138,13 @@ class EC:
             i = self.psi(m) * (e*f - g*h)
             r = i // Pol([Unit(2, 0, 1)])
             return r.ec_reduction(self.a, self.b)
+            #return r
 
     def phi(self, n):
         assert(n >= 1)
         r = Pol([Unit(1, 1, 0)]) * (self.psi(n) ** 2) - self.psi(n+1) * self.psi(n-1)
         return r.ec_reduction(self.a, self.b)
+        #return r
 
     def omega(self, n):
         assert(n >= 1)
@@ -149,24 +152,25 @@ class EC:
             return Pol([Unit(1, 0, 1)])
         else:
             r = (self.psi(n+2) * (self.psi(n-1) ** 2) - self.psi(n-2) * (self.psi(n+1) ** 2)) // Pol([Unit(4, 0, 1)])
+            #return r
             return r.ec_reduction(self.a, self.b)
+
+    def omega_yminus(self, n):
+        return self.omega(n) // Pol([Unit(1, 0, 1)])
 
     def __str__(self):
         return "EC(" + str(self.a) + "," + str(self.b) + "," + str(self.p) + ")" 
 
 if __name__ == '__main__':
-    """
-    #ec = EC(-7, 6, 19)
-    ec = EC(1, 1, 19)
+    ec = EC(2, 1, 19)
     for i in range(6):
         print(ec.psi(i))
     print("")
     for i in range(1, 6):
         print(ec.phi(i))
     print("")
-    for i in range(2, 6):
+    for i in range(1, 6):
         print(ec.omega(i))
-    """
 
     """
     # l = 2
@@ -176,70 +180,4 @@ if __name__ == '__main__':
     e = c.is_gcd_one(d)
     print("c:"+str(c) + ",d:"+str(d)+",is_gcd_one:"+str(e))
     """
-
-    q = 19
-    ec = EC(2, 1, q)
-    """
-    l = 5
-    ql = q % l
-    """
-
-    for l in [3, 5]:
-        ql = q % l
-        print("q:"+str(q)+" l:"+str(l) + " ql:"+str(ql))
-        jmax = (l-1)//2
-        print("j:[1, "+str(jmax)+"]")
-        found = False
-        for j in range(1, jmax + 1):
-            print("j:"+str(j))
-            p1 = (((ec.omega(ql)-Pol([Unit(1, 0, q ** 2)]).ec_reduction(ec.a, ec.b) * (ec.psi(ql) ** 3)) ** 2) \
-                 - (ec.phi(ql) + Pol([Unit(1, q ** 2, 0)]) * (ec.psi(ql) ** 2)) * \
-                   (ec.phi(ql) - Pol([Unit(1, q ** 2, 0)]) * (ec.psi(ql) ** 2)) ** 2) * (ec.psi(j).toFrob(q) ** 2) \
-                 - (ec.psi(ql) ** 2) * ((ec.phi(ql) - Pol([Unit(1, q ** 2, 0)]) * (ec.psi(ql) ** 2)) ** 2) * ec.phi(j).toFrob(q)
-            p2 = p1.ec_reduction(ec.a, ec.b)
-            p3 = p2.toField(q)
-            print("pol:"+str(p3))
-            print("psi("+str(l)+"):"+str(ec.psi(l).toField(q)))
-            p4 = p3 % ec.psi(l).toField(q)
-            print("pol % psi("+str(l)+"):"+str(p4))
-            if p4.iszero():
-                found = True
-                break
-            else:
-                print("invalid")
-        if found:
-            print("found")
-            # TODO:
-            continue
-
-        # (d)
-        found = False
-        w = 1
-        for i in range(1, l-1+1):
-            if (i ** 2) % l == ql:
-                found = True
-                w = i
-                break
-        if not found:
-            print("a = 0 mod l because of w not found (d)")
-            continue
-        # (e) x
-        p1 = Pol([Unit(1, q, 0)]) * (ec.psi(w) ** 2) - ec.phi(w)
-        p2 = p1.ec_reduction(ec.a, ec.b)
-        p3 = p2.toField(q)
-        print(p3)
-        p4 = p3 % ec.psi(l).toField(q)
-        print(p4)
-        if not p4.iszero():
-            print("a = 0 mod l because of gcd = 1 (e)")
-            continue
-        # (e) y
-        p5 = (Pol([Unit(1, 0, q)]) * (ec.psi(w) ** 3) - ec.omega(w)) // Pol([Unit(1, 0, 1)])
-        p6 = p5.ec_reduction(ec.a, ec.b)
-        p7 = p6.toField(q)
-        print(p7)
-        if p7.is_gcd_one(rc.psi(l).toField(q)):
-            print("a = "+str(-2*w) + " mod l")
-        else:
-            print("a = "+str(2*w) + " mod l")
 

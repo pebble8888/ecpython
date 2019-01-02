@@ -5,6 +5,7 @@ from field import F
 import copy
 import sympy as sy
 import unittest
+import sys
 
 class Pol:
     def __init__(self, units):
@@ -85,6 +86,9 @@ class Pol:
         for i in range(other-1):
             m = m * self
             m.normalize()
+            #print(":", end="")
+            #sys.stdout.flush()
+        m.normalize()
         return m 
 
     def __floordiv__(self, other):
@@ -109,8 +113,16 @@ class Pol:
                 break
             q = Pol([Unit(tmp_h.coef // o_h.coef, tmp_h.xpower - o_h.xpower, 0)])
             tmp = tmp - q * other
-            tmp.normalize()
+            #tmp.normalize()
+            #print(".", end="")
+            #sys.stdout.flush()
         return tmp
+
+    def __neg__(self):
+        l_units = []
+        for i in self.units:
+            l_units.append(-i)
+        return Pol(l_units)
 
     def __eq__(self, other):
         if len(self.units) != len(other.units):
@@ -275,14 +287,19 @@ class TestUnit(unittest.TestCase):
         expect = Unit(12,0,0).toField(19)
         self.assertEqual(actual, expect)
 
-    def test_toXPower(self):
-        actual = Unit(2, 3, 0).toXPower(2)
+    def test_toFrob(self):
+        actual = Unit(2, 3, 0).toFrob(2)
         expect = Unit(2, 6, 0)
         self.assertEqual(actual, expect)
 
-    def test_toYPower(self):
-        actual = Unit(2, 0, 3).toYPower(2)
+    def test_toFrob(self):
+        actual = Unit(2, 0, 3).toFrob(2)
         expect = Unit(2, 0, 6)
+        self.assertEqual(actual, expect)
+
+    def test_toFrob(self):
+        actual = Unit(4, 1, 1).toFrob(2)
+        expect = Unit(4, 2, 2)
         self.assertEqual(actual, expect)
 
 # test for Pol
@@ -292,9 +309,19 @@ class TestPol(unittest.TestCase):
         expect = Pol([Unit(2,1,1)])
         self.assertEqual(actual, expect)
 
+    def test_neg(self):
+        actual = - Pol([Unit(2,1,1)])
+        expect = Pol([Unit(-2,1,1)])
+        self.assertEqual(actual, expect)
+
     def test_mul1(self):
         actual = Pol([Unit(1,3,0), Unit(1,0,0)]) * Pol([Unit(1,3,0), Unit(1,0,0)])
         expect = Pol([Unit(1,6,0), Unit(2,3,0), Unit(1,0,0)])
+        self.assertEqual(actual, expect)
+
+    def test_mul2(self):
+        actual = Pol([Unit(2,0,0)]) * Pol([Unit(1,3,0)])
+        expect = Pol([Unit(2,3,0)])
         self.assertEqual(actual, expect)
     
     def test_pow(self):
@@ -303,8 +330,8 @@ class TestPol(unittest.TestCase):
         self.assertEqual(actual, expect)
 
     def test_pow3(self):
-        actual = Pol([Unit(1,3,0), Unit(1,0,0)]) ** 3
-        expect = Pol([Unit(1,9,0), Unit(3,6,0), Unit(3,3,0), Unit(1,0,0)])
+        actual = Pol([Unit(1,3,1), Unit(1,0,1)]) ** 3
+        expect = Pol([Unit(1,9,3), Unit(3,6,3), Unit(3,3,3), Unit(1,0,3)])
         self.assertEqual(actual, expect)
 
     def test_reduction(self):
