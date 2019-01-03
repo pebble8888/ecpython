@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-gp = 19
-ec = EC(2, 1, gp)
+gp = 43
+ec = EC(0, 7, gp)
 
 print("F" + str(ec.p))
 print("#EC:" + str(ec.order))
