@@ -6,7 +6,7 @@ from polynomial import Pol
 from polynomial import Unit
 
 if __name__ == '__main__':
-    q = 19
+    q = 11
     ec = EC(2, 1, q)
 
     for l in [3, 5]:

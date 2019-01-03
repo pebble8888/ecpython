@@ -6,6 +6,7 @@ import copy
 import sympy as sy
 import unittest
 import sys
+from functools import lru_cache
 
 class Pol:
     def __init__(self, units):
@@ -80,6 +81,7 @@ class Pol:
                 l_units.append(i * j)
         return Pol(l_units)
 
+    #@lru_cache()
     def __pow__(self, other):
         assert(other != 0)
         m = copy.copy(self)
@@ -90,6 +92,24 @@ class Pol:
             #sys.stdout.flush()
         m.normalize()
         return m 
+        """
+        if other == 1:
+            return self 
+        elif other == 2:
+            m = copy.copy(self)
+            m = m * self
+            m.normalize()
+            return m
+        m = copy.copy(self)
+        if other % 2 == 0:
+            n = other // 2 
+            m = (m ** n) ** 2
+        else:
+            n = other // 2
+            m = ((m ** n) ** 2) * self 
+        m.normalize()
+        return m
+        """
 
     def __floordiv__(self, other):
         if len(other.units) == 0:

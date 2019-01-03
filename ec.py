@@ -6,6 +6,7 @@ from polynomial import Pol
 from polynomial import Unit
 from field import F
 import copy
+from functools import lru_cache
 
 class Point:
     # x, y is Field
@@ -99,6 +100,7 @@ class EC:
             t_pt = self.plus(t_pt, pt)
         return t_pt
 
+    @lru_cache(maxsize=None)
     def psi(self, n):
         assert(n >= 0)
         if n == 0:
@@ -128,7 +130,6 @@ class EC:
             h = self.psi(m+1) ** 3
             r = e*f - g*h
             return r.ec_reduction(self.a, self.b)
-            #return r
         else:
             m = n//2
             e = self.psi(m+2) 
@@ -138,25 +139,21 @@ class EC:
             i = self.psi(m) * (e*f - g*h)
             r = i // Pol([Unit(2, 0, 1)])
             return r.ec_reduction(self.a, self.b)
-            #return r
 
+    @lru_cache(maxsize=None)
     def phi(self, n):
         assert(n >= 1)
         r = Pol([Unit(1, 1, 0)]) * (self.psi(n) ** 2) - self.psi(n+1) * self.psi(n-1)
         return r.ec_reduction(self.a, self.b)
-        #return r
 
+    @lru_cache(maxsize=None)
     def omega(self, n):
         assert(n >= 1)
         if n == 1:
             return Pol([Unit(1, 0, 1)])
         else:
             r = (self.psi(n+2) * (self.psi(n-1) ** 2) - self.psi(n-2) * (self.psi(n+1) ** 2)) // Pol([Unit(4, 0, 1)])
-            #return r
             return r.ec_reduction(self.a, self.b)
-
-    def omega_yminus(self, n):
-        return self.omega(n) // Pol([Unit(1, 0, 1)])
 
     def __str__(self):
         return "EC(" + str(self.a) + "," + str(self.b) + "," + str(self.p) + ")" 
