@@ -28,9 +28,9 @@ if __name__ == '__main__':
             den2 = ec.psi(j).toFrob(q) ** 2
             p1 = num1 * den2 - num2 * den1
             p1 = p1.ec_reduction(ec.a, ec.b)
-            p3 = p1.toField(q)
-            p4 = p3 % ec.psi(l).toField(q)
-            if p4.iszero():
+            p1 = p1.toField(q)
+            p1 = p1 % ec.psi(l).toField(q)
+            if p1.iszero():
                 found = True
                 break
             else:
