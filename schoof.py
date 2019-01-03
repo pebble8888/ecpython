@@ -6,7 +6,7 @@ from polynomial import Pol
 from polynomial import Unit
 
 if __name__ == '__main__':
-    q = 11
+    q = 19
     ec = EC(2, 1, q)
 
     for l in [3, 5]:
@@ -29,10 +29,7 @@ if __name__ == '__main__':
             p1 = num1 * den2 - num2 * den1
             p1 = p1.ec_reduction(ec.a, ec.b)
             p3 = p1.toField(q)
-            #print("pol:"+str(p3))
-            #print("psi("+str(l)+"):"+str(ec.psi(l).toField(q)))
             p4 = p3 % ec.psi(l).toField(q)
-            #print("pol % psi("+str(l)+"):"+str(p4))
             if p4.iszero():
                 found = True
                 break
@@ -42,22 +39,15 @@ if __name__ == '__main__':
             print("x found")
             # y
             d = (ec.omega(ql) - Pol([Unit(1, 0, q ** 2)]) * (ec.psi(ql)**3))
-            #print("d:"+str(d))
             e = - ec.phi(ql) + Pol([Unit(2, q ** 2, 0)]) * (ec.psi(ql)**2)
             e = e.ec_reduction(ec.a, ec.b)
-            #print("e:"+str(e))
             f = ec.phi(ql) - Pol([Unit(1, q ** 2, 0)]) * (ec.psi(ql)**2)
             f = f.ec_reduction(ec.a, ec.b)
-            #print("f:"+str(f))
             num1 = d * (e * (f**2) - (d**2)) - Pol([Unit(1, 0, q **2)]) * (ec.psi(ql)**3) * (f**3)
             num1 = num1 * ec.psi(ql)
             den1 = (ec.psi(ql)**3) * (f**3) * ec.psi(ql)
             num2 = ec.omega(j).toFrob(q)
             den2 = ec.psi(j).toFrob(q) ** 3
-            #print("num1: "+str(num1.ec_reduction(ec.a, ec.b)))
-            #print("den1: "+str(den1.ec_reduction(ec.a, ec.b)))
-            #print("num2: "+str(num2.ec_reduction(ec.a, ec.b)))
-            #print("den2: "+str(den2.ec_reduction(ec.a, ec.b)))
             p1 = num1 * den2 - num2 * den1
             p2 = p1.ec_reduction(ec.a, ec.b)
             if p2.hasY():
@@ -65,7 +55,6 @@ if __name__ == '__main__':
             else:
                 p3 = p2
             p4 = p3.toField(q)
-            #print("p4: "+str(p4))
             psil = ec.psi(l).toField(q)
             print("psi("+str(l)+"):"+str(psil))
             p6 = p4 % psil

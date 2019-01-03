@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import unittest
+
 class F:
     def __init__(self, p, v):
         self.p = p
@@ -55,4 +57,13 @@ class F:
     def __eq__(self, other):
         assert(self.p == other.p)
         return self.v == other.v
+
+class TestField(unittest.TestCase):
+    def test_divide(self):
+        actual = F(3, 1) // F(3, 1)    
+        expect = F(3, 1) 
+        self.assertEqual(actual, expect)
+    
+if __name__ == '__main__':
+    unittest.main()
 
