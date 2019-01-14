@@ -1,6 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import hashlib
+
 h = hashlib.new('ripemd160')
 h.update(b"abc")
 r1 = h.hexdigest()

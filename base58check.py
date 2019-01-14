@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import base58
 import hashlib
@@ -12,14 +12,27 @@ def b58check(version, payload):
     e = d + h2digest[0:4]
     return base58.b58encode(e)
 
-ba = bytes.fromhex("037c3e90284927ea5a46cb7f4d8c91a5d6defd3827144b28ad2451b524becb9806")
-d = hashlib.sha256(ba).digest()
-m = hashlib.new('ripemd160')
-m.update(d)
-ba = m.digest()
+def hash160(ba):
+    d = hashlib.sha256(ba).digest()
+    m = hashlib.new('ripemd160')
+    m.update(d)
+    return m.digest()
 
-r1 = b58check(bytes.fromhex("6f"), ba) 
+#pubkeyhex = "0307be6887e97bf74882ff3bb73aab63f7fe48931bbc7281c5d325606f683cbaf0"
+#pubkeyhex = "0377fcfd729e8e580a7bf849bed9bbc44d4062e9090df097f34fb2adcb74bfc44f"
+#pubkeyhex = "03468067c38b846a4af20520b0aae8dcd344391770d200eaf82cc8f391a44c6845"
+#ba = bytes.fromhex(pubkeyhex)
+#ba = hash160(ba)
+
+ba = bytes.fromhex("00147a1fccd58db0bcb244c6db4367872bbd6f43d07d")
+
+# 00: mainnet bitcoin address
+# 6f: testnet bitcoin address
+# 05: mainnet P2SH address
+# c4: testnet P2SH address
+#hex_version = "00"
+#hex_version = "6f"
+a = "c4"
+r1 = b58check(bytes.fromhex(hex_version), ba) 
 print(r1)
-
-
 
