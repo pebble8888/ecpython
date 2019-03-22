@@ -14,4 +14,6 @@ int.from_bytes(b'\xde\xad\xbe\xef', 'big')
 # int to bytes
 128.to_bytes(2, 'big') # 2バイトでbig
 
+# hex to bytes 
+bytes.fromhex("0102")
 
