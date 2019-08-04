@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-gp = 43
+gp = 17
 ec = EC(0, 7, gp)
 
 print("F" + str(ec.p))

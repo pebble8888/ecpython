@@ -129,6 +129,7 @@ class EC:
             g = self.psi(m-1)
             h = self.psi(m+1) ** 3
             r = e*f - g*h
+            r = r.ec_reduction(self.a, self.b)
             return r
         else:
             m = n//2
@@ -138,11 +139,13 @@ class EC:
             h = self.psi(m+1) ** 2
             i = self.psi(m) * (e*f - g*h)
             r = i // Pol([Unit(2, 0, 1)])
+            r = r.ec_reduction(self.a, self.b)
             return r
 
     def phi(self, n):
         assert(n >= 1)
         r = Pol([Unit(1, 1, 0)]) * (self.psi(n) ** 2) - self.psi(n+1) * self.psi(n-1)
+        r = r.ec_reduction(self.a, self.b)
         return r
 
     def omega(self, n):
@@ -151,13 +154,14 @@ class EC:
             return Pol([Unit(1, 0, 1)])
         else:
             r = (self.psi(n+2) * (self.psi(n-1) ** 2) - self.psi(n-2) * (self.psi(n+1) ** 2)) // Pol([Unit(4, 0, 1)])
+            r = r.ec_reduction(self.a, self.b)
             return r
 
     def __str__(self):
         return "EC(" + str(self.a) + "," + str(self.b) + "," + str(self.p) + ")" 
 
 if __name__ == '__main__':
-    ec = EC(2, 1, 19)
+    ec = EC(1, 1, 19)
     for i in range(6):
         print(ec.psi(i))
     print("")
