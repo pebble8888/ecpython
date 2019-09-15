@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-gp = 17
-ec = EC(0, 7, gp)
+gp=13
+ec=EC(1, 2, gp)
 
 print("F" + str(ec.p))
 print("#EC:" + str(ec.order))
+print("j:" + str(ec.j))
 print("")
 
 plotx = [p.x.v for p in ec.points]
@@ -23,11 +24,13 @@ for i in range(ec.points_count):
         p = ec.mul(baseP, j)
         print( str(j)+"*P"+str(i+1)+":"+str(p) )
         if p.isinf():
-            print("order:{0}".format(j))
-            print("")
-        if p == baseP:
-            print("")
             break
+            #print("order:{0}".format(j))
+            #print("")
+        #if p == baseP:
+        #    print("")
+        #    break
+    print("")
 
 """
 for i in range(ec.points_count):
@@ -47,6 +50,7 @@ for i in range(ec.points_count):
         print("P"+str(i+1) + "+P"+str(j+1)+"="+s)
 """
     
+"""
 fig, ax = plt.subplots()
 ax.scatter(plotx, ploty)
 
@@ -54,3 +58,4 @@ for i, txt in enumerate(n):
     ax.annotate(txt, (plotx[i],ploty[i]))
 
 plt.show()
+"""

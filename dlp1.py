@@ -5,9 +5,9 @@ from ec import Point
 
 ec = EC(0, 7, 31)
 print("order:" + str(ec.order))
-G = Point(1, 15)
+G = Point(1, 15, 0)
 print("G:" + G.desc())
-R = Point(25, 15)
+R = Point(25, 15, 0)
 print("R:" + R.desc())
 
 def exhaustive_search(G, R, ec):

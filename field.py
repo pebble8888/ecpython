@@ -9,8 +9,8 @@ class F:
         self.normalize()
 
     def normalize(self):
-        if self.v is not None:
-            self.v = self.v % self.p
+        #if self.v is not None:
+        self.v = self.v % self.p
 
     def __add__(self, other):
         assert(self.p == other.p)
@@ -41,15 +41,10 @@ class F:
         return F(self.p, self.v % other.v)
 
     def iszero(self):
-        if self.v is None:
-            return False
         return self.v == 0
 
     def isone(self):
         return self.v == 1
-
-    def isinf(self):
-        return self.v is None
 
     def __str__(self):
         return str(self.v) 

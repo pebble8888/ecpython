@@ -7,15 +7,17 @@ from polynomial import Unit
 from field import F
 import copy
 from functools import lru_cache
+import sys
 
 class Point:
     # x, y is Field
-    def __init__(self, x, y):
+    def __init__(self, x, y, z):
         self.x = x
         self.y = y
+        self.z = z
     
     def __str__(self):
-        if self.x.isinf() and self.y.isinf():
+        if self.isinf():
             return "O"
         return "("+str(self.x)+","+str(self.y)+")"
     
@@ -23,17 +25,17 @@ class Point:
         return self.x == other.x and self.y == - other.y
         
     def isinf(self):
-        return self.x.isinf() and self.y.isinf()
+        return self.z.v != 0
 
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y 
+        return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __ne__(self, other):
         return not self.__eq__(other)
     
     @staticmethod
     def inf(prime):
-        return Point(F(prime, None), F(prime, None))
+        return Point(F(prime, 0), F(prime, 0), F(prime, 1))
 
 class EC:
     # y^2 = x^3 + a * x + b
@@ -44,12 +46,20 @@ class EC:
         self.b = b
         self.p = p
         self.calc_order()
+        a1 = F(self.p, 4) * (F(self.p, a) ** 3) 
+        b1 = F(self.p, 27) * (F(self.p, b) ** 2)
+        c1 = a1 + b1
+        if c1.iszero():
+            print("singular curve! j invariant is infinity!")
+            exit()
+
+        self.j = F(self.p, 1728) * a1 // c1
     
     def calc_order(self):
         self.points = []
         for x in range(self.p):
             for y in range(self.p):
-                pt = Point(F(self.p, x),F(self.p, y))
+                pt = Point(F(self.p, x), F(self.p, y), F(self.p, 0))
                 if self.oncurve(pt):
                     self.points.append(pt)
         self.points_count = len(self.points)
@@ -88,7 +98,7 @@ class EC:
             x3 = lm ** 2 - x1 - x2
             y3 = -(lm*(x3-x1) + y1)
 
-        q = Point(F(self.p, x3), F(self.p, y3))
+        q = Point(F(self.p, x3), F(self.p, y3), F(self.p, 0))
         if not self.oncurve(q):
             print("q=" + str(q))
             assert False
