@@ -25,7 +25,7 @@ class Point:
         return self.x == other.x and self.y == - other.y
         
     def isinf(self):
-        return self.z.v != 0
+        return self.z.v == 0
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.z == other.z
@@ -35,7 +35,7 @@ class Point:
     
     @staticmethod
     def inf(prime):
-        return Point(F(prime, 0), F(prime, 0), F(prime, 1))
+        return Point(F(prime, 0), F(prime, 1), F(prime, 1))
 
 class EC:
     # y^2 = x^3 + a * x + b
@@ -59,7 +59,7 @@ class EC:
         self.points = []
         for x in range(self.p):
             for y in range(self.p):
-                pt = Point(F(self.p, x), F(self.p, y), F(self.p, 0))
+                pt = Point(F(self.p, x), F(self.p, y), F(self.p, 1))
                 if self.oncurve(pt):
                     self.points.append(pt)
         self.points_count = len(self.points)
@@ -98,7 +98,7 @@ class EC:
             x3 = lm ** 2 - x1 - x2
             y3 = -(lm*(x3-x1) + y1)
 
-        q = Point(F(self.p, x3), F(self.p, y3), F(self.p, 0))
+        q = Point(F(self.p, x3), F(self.p, y3), F(self.p, 1))
         if not self.oncurve(q):
             print("q=" + str(q))
             assert False
