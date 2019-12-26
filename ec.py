@@ -35,7 +35,7 @@ class Point:
     
     @staticmethod
     def inf(prime):
-        return Point(F(prime, 0), F(prime, 1), F(prime, 1))
+        return Point(F(prime, 0), F(prime, 1), F(prime, 0))
 
 class EC:
     # y^2 = x^3 + a * x + b
