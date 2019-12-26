@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from ec import EC
 from ec import Point
 
-gp=13
-ec=EC(1, 2, gp)
+gp=7
+ec=EC(2, 1, gp)
 
 print("F" + str(ec.p))
 print("#EC:" + str(ec.order))
@@ -50,7 +50,6 @@ for i in range(ec.points_count):
         print("P"+str(i+1) + "+P"+str(j+1)+"="+s)
 """
     
-"""
 fig, ax = plt.subplots()
 ax.scatter(plotx, ploty)
 
@@ -58,4 +57,4 @@ for i, txt in enumerate(n):
     ax.annotate(txt, (plotx[i],ploty[i]))
 
 plt.show()
-"""
+
