@@ -100,7 +100,7 @@ while True:
 
     print(".", end='', flush=True)
 
-    command = "bitcoin-cli scantxoutset start \"[ \\\"pk(04{:032x}{:032x})\\\" \"] > tmp.json".format(PK[0], PK[1])
+    command = "bitcoin-cli scantxoutset start \"[ \\\"pk(04{:064x}{:064x})\\\" \"] > tmp.json".format(PK[0], PK[1])
     os.system(command)
     
     with open("tmp.json", 'r') as f:
