@@ -42,11 +42,11 @@ def add_pt(P, Q):
     y1 = P[1]
     x2 = Q[0]
     y2 = Q[1]
-    if x1 == -1 and y1 == -1: return Q
-    if x2 == -1 and y2 == -1: return P
+    if x1 == 0 and y1 == 0: return Q
+    if x2 == 0 and y2 == 0: return P
     if x1 == x2:
         if (y1 + y2) % q == 0:
-            return [-1, -1]
+            return [0, 0]
         else:
             return double_pt(P)
 
@@ -56,7 +56,7 @@ def add_pt(P, Q):
     return [x3 % q, y3 % q]
 
 def scalarmult(P, e):
-    if e == 0: return [-1, -1]
+    if e == 0: return [0, 0]
     Q = scalarmult(P, e//2)
     Q = add_pt(Q, Q)
     if e & 1: Q = add_pt(Q, P)
@@ -100,7 +100,7 @@ while True:
 
     print(".", end='', flush=True)
 
-    command = "bitcoin-cli scantxoutset start \"[ \\\"pk(04{:x}{:x})\\\" \"] > tmp.json".format(PK[0], PK[1])
+    command = "bitcoin-cli scantxoutset start \"[ \\\"pk(04{:032x}{:032x})\\\" \"] > tmp.json".format(PK[0], PK[1])
     os.system(command)
     
     with open("tmp.json", 'r') as f:
